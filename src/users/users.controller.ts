@@ -17,18 +17,24 @@ import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserPassword } from './dto/update-user-password.dto';
 import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('USERS')
 @Controller('/user')
 @UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'Get all users' })
+  @ApiResponse({ status: 200 })
   @Get()
   @HttpCode(200)
   async getUsers(): Promise<User[]> {
     return this.usersService.getUsers();
   }
 
+  @ApiOperation({ summary: 'Get user by id' })
+  @ApiResponse({ status: 200 })
   @Get(':id')
   @HttpCode(200)
   async getUser(@Param('id') id: string) {
@@ -36,6 +42,8 @@ export class UsersController {
     return new UserEntity(user);
   }
 
+  @ApiOperation({ summary: 'Create new user' })
+  @ApiResponse({ status: 201 })
   @Post()
   @HttpCode(201)
   @UsePipes(ValidationPipe)
@@ -44,6 +52,8 @@ export class UsersController {
     return new UserEntity(user);
   }
 
+  @ApiOperation({ summary: 'Update user password' })
+  @ApiResponse({ status: 200 })
   @Put(':id')
   @HttpCode(200)
   @UsePipes(ValidationPipe)
@@ -55,6 +65,8 @@ export class UsersController {
     return new UserEntity(user);
   }
 
+  @ApiOperation({ summary: 'Delete user by id' })
+  @ApiResponse({ status: 204 })
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {
