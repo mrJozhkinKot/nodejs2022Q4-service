@@ -8,7 +8,7 @@
 ## Downloading
 
 ```
-git clone {repository URL}
+git clone https://github.com/mrJozhkinKot/nodejs2022Q4-service
 ```
 
 ## Installing NPM modules
@@ -68,5 +68,7 @@ npm run format
 ### Debugging in VSCode
 
 Press <kbd>F5</kbd> to debug.
+
+Use documentation: *http://localhost:{PORT}/api/docs*
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
