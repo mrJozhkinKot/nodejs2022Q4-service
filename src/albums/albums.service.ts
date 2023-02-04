@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { albums, tracks } from 'src/db/db';
+import { albums, favorites, tracks } from 'src/db/db';
 import { v4 as uuid4 } from 'uuid';
 import { validateId } from 'src/helpers/validateId';
 import { ERROR_INVALID_ID, ERROR_ALBUM_NOT_FOUND } from 'src/helpers/constants';
@@ -70,6 +70,11 @@ export class AlbumsService {
     tracks.forEach((track, index) => {
       if (track.albumId === album.id) {
         tracks.splice(index, 1, { ...track, albumId: null });
+      }
+    });
+    favorites.albums.forEach((fav, index) => {
+      if (fav === album.id) {
+        favorites.albums.splice(index, 1);
       }
     });
   }

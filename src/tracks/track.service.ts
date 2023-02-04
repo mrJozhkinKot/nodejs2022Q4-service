@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { tracks } from 'src/db/db';
+import { favorites, tracks } from 'src/db/db';
 import { v4 as uuid4 } from 'uuid';
 import { validateId } from 'src/helpers/validateId';
 import { ERROR_INVALID_ID, ERROR_TRACK_NOT_FOUND } from 'src/helpers/constants';
@@ -65,6 +65,11 @@ export class TracksService {
     tracks.forEach((t, index) => {
       if (t.id === track.id) {
         tracks.splice(index, 1);
+      }
+    });
+    favorites.tracks.forEach((fav, index) => {
+      if (fav === track.id) {
+        favorites.tracks.splice(index, 1);
       }
     });
   }
