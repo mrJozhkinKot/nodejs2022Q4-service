@@ -6,7 +6,10 @@ import {
 import { artists, tracks } from 'src/db/db';
 import { v4 as uuid4 } from 'uuid';
 import { validateId } from 'src/helpers/validateId';
-import { ERROR_INVALID_ID, ERROR_TRACK_NOT_FOUND } from 'src/helpers/constants';
+import {
+  ERROR_INVALID_ID,
+  ERROR_ARTIST_NOT_FOUND,
+} from 'src/helpers/constants';
 import { CreateArtistDTO } from './dto/create-artist.dto';
 import { Artist } from 'src/types/interfaces';
 import { UpdateArtistDTO } from './dto/update-artist-dto';
@@ -22,7 +25,7 @@ export class ArtistsService {
     }
     const artist = artists.find((track) => track.id === id);
     if (!artist) {
-      throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
+      throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
     return artist;
   }
@@ -41,7 +44,7 @@ export class ArtistsService {
     }
     const artist = artists.find((track) => track.id === id);
     if (!artist) {
-      throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
+      throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
     const updatedArtist = {
       ...artist,
@@ -60,7 +63,7 @@ export class ArtistsService {
     }
     const artist = artists.find((task) => task.id === id);
     if (!artist) {
-      throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
+      throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
     artists.forEach((a, index) => {
       if (a.id === artist.id) {
