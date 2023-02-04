@@ -9,13 +9,17 @@ import {
   UsePipes,
   ValidationPipe,
   HttpCode,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { User } from 'src/types/interfaces';
 import { CreateUserDTO } from './dto/create-user.dto';
 import { UpdateUserPassword } from './dto/update-user-password.dto';
+import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
 
 @Controller('/user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -28,14 +32,16 @@ export class UsersController {
   @Get(':id')
   @HttpCode(200)
   async getUser(@Param('id') id: string) {
-    return this.usersService.getUser(id);
+    const user = await this.usersService.getUser(id);
+    return new UserEntity(user);
   }
 
   @Post()
   @HttpCode(201)
   @UsePipes(ValidationPipe)
   async createUser(@Body() userDto: CreateUserDTO) {
-    return this.usersService.createUser(userDto);
+    const user = await this.usersService.createUser(userDto);
+    return new UserEntity(user);
   }
 
   @Put(':id')
@@ -45,7 +51,8 @@ export class UsersController {
     @Param('id') id: string,
     @Body() userDto: UpdateUserPassword,
   ) {
-    return this.usersService.updateUserPassword(id, userDto);
+    const user = await this.usersService.updateUserPassword(id, userDto);
+    return new UserEntity(user);
   }
 
   @Delete(':id')

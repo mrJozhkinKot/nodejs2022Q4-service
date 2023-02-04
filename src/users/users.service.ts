@@ -39,7 +39,8 @@ export class UsersService {
     const id = uuid4();
     const user: User = {
       id,
-      ...dto,
+      login: dto.login,
+      password: dto.password,
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -64,6 +65,7 @@ export class UsersService {
     const updatedUser = {
       ...user,
       password: dto.newPassword,
+      version: user.version + 1,
       updatedAt: Date.now(),
     };
     users.forEach((u, index) => {
