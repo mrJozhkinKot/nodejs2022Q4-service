@@ -16,11 +16,19 @@ import {
   ERROR_WRONG_PASSWORD,
 } from 'src/helpers/constants';
 import { UpdateUserPassword } from './dto/update-user-password.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from './user.entity';
 
 @Injectable()
 export class UsersService {
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
   async getUsers() {
-    return users;
+    const users1 = await this.userRepository.find();
+    return users1;
   }
   async getUser(id: string) {
     if (!validateId(id)) {

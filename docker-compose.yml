@@ -4,8 +4,7 @@ services:
   node:
     container_name: main
     restart: always
-    build: 
-      context: .
+    build: .
     command: npm run start:dev
     image: juliapike/nodejs2022q4
     ports:
