@@ -1,6 +1,13 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  VersionColumn,
+} from 'typeorm';
 
 @Entity({ name: 'users' })
 export class UserEntity {
@@ -20,19 +27,21 @@ export class UserEntity {
     example: 1,
     description: 'update version',
   })
-  @Column()
+  @VersionColumn()
   version: number; // integer number, increments on update
   @ApiProperty({
     example: 1675507358201,
     description: 'time of create',
   })
-  @Column()
+  @CreateDateColumn()
+  @Transform(({ value }) => Number(value))
   createdAt: number; // timestamp of creation
   @ApiProperty({
     example: 1675507358201,
     description: 'time of update',
   })
-  @Column()
+  @UpdateDateColumn()
+  @Transform(({ value }) => Number(value))
   updatedAt: number; // timestamp of last update
 
   @Exclude()
