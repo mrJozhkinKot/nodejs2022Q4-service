@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { favorites, tracks } from 'src/db/db';
+import { favorites } from 'src/db/db';
 import { validateId } from 'src/helpers/validateId';
 import {
   ERROR_INVALID_ID,
@@ -14,12 +14,15 @@ import { UpdateArtistDTO } from './dto/update-artist-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArtistEntity } from './artist.entity';
+import { TracksService } from 'src/tracks/track.service';
 
 @Injectable()
 export class ArtistsService {
   constructor(
     @InjectRepository(ArtistEntity)
     private readonly artistRepository: Repository<ArtistEntity>,
+
+    private trackService: TracksService,
   ) {}
 
   async getArtists() {
@@ -65,12 +68,18 @@ export class ArtistsService {
     if (!artist) {
       throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
+
+    const tracks = await this.trackService.getTracks();
+    const tracksOfAlbum = tracks.filter((track) => track.artistId === id);
+    tracksOfAlbum.map(
+      async (track) =>
+        await this.trackService.updateTrack(track.id, {
+          ...track,
+          artistId: null,
+        }),
+    );
+
     return await this.artistRepository.delete(artist.id);
-    // tracks.forEach((track, index) => {
-    //   if (track.artistId === artist.id) {
-    //     tracks.splice(index, 1, { ...track, artistId: null });
-    //   }
-    // });
     // favorites.artists.forEach((fav, index) => {
     //   if (fav === artist.id) {
     //     favorites.artists.splice(index, 1);
