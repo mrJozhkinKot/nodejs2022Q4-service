@@ -73,6 +73,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(ERROR_USER_NOT_FOUND);
     }
-    return this.userRepository.delete(user.id);
+    return await this.userRepository.delete(user.id);
   }
 }

@@ -25,7 +25,7 @@ export class ArtistsController {
   @ApiResponse({ status: 200 })
   @Get()
   @HttpCode(200)
-  async getTracks(): Promise<Artist[]> {
+  async getArtists(): Promise<Artist[]> {
     return this.artistsService.getArtists();
   }
   @ApiOperation({ summary: 'Get artist by id' })
