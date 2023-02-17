@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { favorites } from 'src/db/db';
 import { validateId } from 'src/helpers/validateId';
 import { ERROR_INVALID_ID, ERROR_ALBUM_NOT_FOUND } from 'src/helpers/constants';
 import { CreateAlbumDTO } from './dto/create-album.dto';

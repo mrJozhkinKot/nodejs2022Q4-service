@@ -3,22 +3,22 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { favorites } from 'src/db/db';
-import { v4 as uuid4 } from 'uuid';
 import { validateId } from 'src/helpers/validateId';
 import { ERROR_INVALID_ID, ERROR_TRACK_NOT_FOUND } from 'src/helpers/constants';
 import { CreateTrackDTO } from './dto/create-track.dto';
-import { Track } from 'src/types/interfaces';
 import { UpdateTrackDTO } from './dto/update-track-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TrackEntity } from './track.entity';
 import { Repository } from 'typeorm';
+import { FavoriteEntity } from 'src/favorites/favorites.entity';
 
 @Injectable()
 export class TracksService {
   constructor(
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
+    @InjectRepository(FavoriteEntity)
+    private favoritesRepository: Repository<FavoriteEntity>,
   ) {}
 
   async getTracks() {
@@ -61,11 +61,7 @@ export class TracksService {
     if (!track) {
       throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
     }
+    await this.favoritesRepository.delete(id);
     return await this.trackRepository.delete(track.id);
-    // favorites.tracks.forEach((fav, index) => {
-    //   if (fav === track.id) {
-    //     favorites.tracks.splice(index, 1);
-    //   }
-    // });
   }
 }

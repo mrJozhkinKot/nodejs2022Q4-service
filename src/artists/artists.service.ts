@@ -3,7 +3,6 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { favorites } from 'src/db/db';
 import { validateId } from 'src/helpers/validateId';
 import {
   ERROR_INVALID_ID,
