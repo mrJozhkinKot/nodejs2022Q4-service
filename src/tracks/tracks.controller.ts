@@ -56,6 +56,6 @@ export class TracksController {
   @Delete(':id')
   @HttpCode(204)
   async deleteTrack(@Param('id') id: string) {
-    return this.tracksService.deleteTask(id);
+    return this.tracksService.deleteTrack(id);
   }
 }

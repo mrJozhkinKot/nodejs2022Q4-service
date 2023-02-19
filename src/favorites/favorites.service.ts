@@ -31,54 +31,63 @@ export class FavoritesService {
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
   ) {}
-
+  initFavs = {
+    artists: [],
+    albums: [],
+    tracks: [],
+  };
   async getFavorites(): Promise<FavoritesRepsonse> {
     const [favIds] = await this.favoriteRepository.find();
     if (!favIds) {
-      return {
-        artists: [],
-        albums: [],
-        tracks: [],
-      };
+      return this.initFavs;
     }
-    const artists = favIds.artists
+    const artists = favIds.artists.length
       ? await Promise.all(
-          favIds.artists?.map((artistId) =>
-            this.artistRepository.findOne({ where: { id: artistId } }),
+          favIds.artists.map(
+            async (artistId) =>
+              await this.artistRepository.findOne({ where: { id: artistId } }),
           ),
         )
       : [];
-    const albums = favIds.albums
+    const albums = favIds.albums.length
       ? await Promise.all(
-          favIds.albums.map((albumId) =>
-            this.albumRepository.findOne({ where: { id: albumId } }),
+          favIds.albums.map(
+            async (albumId) =>
+              await this.albumRepository.findOne({ where: { id: albumId } }),
           ),
         )
       : [];
-    const tracks = favIds.tracks
+    const tracks = favIds.tracks.length
       ? await Promise.all(
-          favIds.tracks?.map((trackId) =>
-            this.trackRepository.findOne({ where: { id: trackId } }),
+          favIds.tracks.map(
+            async (trackId) =>
+              await this.trackRepository.findOne({ where: { id: trackId } }),
           ),
         )
       : [];
     return { artists, albums, tracks };
   }
 
-  async addTrack(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
+  async addTrack(id: string): Promise<TrackEntity> {
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const track = await this.trackRepository.findOne({ where: { id: id } });
+    const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
       throw new UnprocessableEntityException(ERROR_TRACK_NOT_FOUND);
     }
-
-    const updatedTracks = favIds.tracks ? [...favIds.tracks, id] : [track.id];
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds) {
+      const updatedFavs = this.favoriteRepository.create({
+        ...this.initFavs,
+        tracks: [id],
+      });
+      await this.favoriteRepository.save(updatedFavs);
+      return track;
+    }
+    const updatedTracks = favIds.tracks.length
+      ? [...new Set([...favIds.tracks, id])]
+      : [track.id];
     const updatedFavs = {
       ...favIds,
       tracks: updatedTracks,
@@ -88,41 +97,46 @@ export class FavoritesService {
   }
 
   async deleteTrack(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const track = await this.trackRepository.findOne({ where: { id: id } });
+    const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
+      throw new UnprocessableEntityException(ERROR_TRACK_NOT_FOUND);
+    }
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds || !favIds.tracks.length) {
       throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
     }
-    const updatedTracks = favIds.tracks
-      ? favIds.tracks.filter((trackId) => trackId !== id)
-      : null;
+    const updatedTracks = favIds.tracks.filter((trackId) => trackId !== id);
     const updatedFavs = {
       ...favIds,
       tracks: updatedTracks,
     };
     await this.favoriteRepository.save(updatedFavs);
-    return updatedFavs;
+    return;
   }
 
-  async addAlbum(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
+  async addAlbum(id: string): Promise<AlbumEntity> {
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const album = await this.albumRepository.findOne({ where: { id: id } });
+    const album = await this.albumRepository.findOne({ where: { id } });
     if (!album) {
       throw new UnprocessableEntityException(ERROR_ALBUM_NOT_FOUND);
     }
-    const updatedAlbums = favIds.albums ? [...favIds.albums, id] : [id];
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds) {
+      const updatedFavs = this.favoriteRepository.create({
+        ...this.initFavs,
+        albums: [id],
+      });
+      await this.favoriteRepository.save(updatedFavs);
+      return album;
+    }
+    const updatedAlbums = favIds.albums.length
+      ? [...new Set([...favIds.albums, id])]
+      : [id];
     const updatedFavs = {
       ...favIds,
       albums: updatedAlbums,
@@ -132,41 +146,45 @@ export class FavoritesService {
   }
 
   async deleteAlbum(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const album = await this.albumRepository.findOne({ where: { id: id } });
+    const album = await this.albumRepository.findOne({ where: { id } });
     if (!album) {
-      throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
+      throw new UnprocessableEntityException(ERROR_ALBUM_NOT_FOUND);
     }
-    const updatedAlbums = favIds.albums
-      ? favIds.albums.filter((albumId) => albumId !== id)
-      : null;
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds || !favIds.albums.length) {
+      throw new NotFoundException(ERROR_ALBUM_NOT_FOUND);
+    }
+    const updatedAlbums = favIds.albums.filter((albumId) => albumId !== id);
     const updatedFavs = {
       ...favIds,
       albums: updatedAlbums,
     };
     await this.favoriteRepository.save(updatedFavs);
-    return updatedFavs;
+    return;
   }
-  async addArtist(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
+
+  async addArtist(id: string): Promise<ArtistEntity> {
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const artist = await this.artistRepository.findOne({ where: { id: id } });
+    const artist = await this.artistRepository.findOne({ where: { id } });
     if (!artist) {
       throw new UnprocessableEntityException(ERROR_ARTIST_NOT_FOUND);
     }
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds) {
+      const updatedFavs = this.favoriteRepository.create({
+        ...this.initFavs,
+        artists: [id],
+      });
+      await this.favoriteRepository.save(updatedFavs);
+      return artist;
+    }
     const updatedArtist = favIds.artists
-      ? [...favIds.artists, id]
+      ? [...new Set([...favIds.artists, id])]
       : [artist.id];
     const updatedFavs = {
       ...favIds,
@@ -177,25 +195,23 @@ export class FavoritesService {
   }
 
   async deleteArtist(id: string) {
-    const [favIds] = await this.favoriteRepository.find();
-    if (!favIds) {
-      this.favoriteRepository.save({});
-    }
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
     const artist = await this.artistRepository.findOne({ where: { id } });
     if (!artist) {
+      throw new UnprocessableEntityException(ERROR_ARTIST_NOT_FOUND);
+    }
+    const [favIds] = await this.favoriteRepository.find();
+    if (!favIds || !favIds.artists.length) {
       throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
-    const updatedArtist = favIds.albums
-      ? favIds.artists.filter((artistId) => artistId !== id)
-      : null;
+    const updatedArtist = favIds.artists.filter((artistId) => artistId !== id);
     const updatedFavs = {
       ...favIds,
       artists: updatedArtist,
     };
     await this.favoriteRepository.save(updatedFavs);
-    return updatedFavs;
+    return;
   }
 }

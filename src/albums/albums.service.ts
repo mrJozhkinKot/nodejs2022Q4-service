@@ -10,15 +10,18 @@ import { UpdateAlbumDTO } from './dto/update-album-dto';
 import { AlbumEntity } from './album.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TracksService } from './../tracks/track.service';
+import { FavoriteEntity } from 'src/favorites/favorites.entity';
+import { TrackEntity } from 'src/tracks/track.entity';
 
 @Injectable()
 export class AlbumsService {
   constructor(
     @InjectRepository(AlbumEntity)
     private albumRepository: Repository<AlbumEntity>,
-
-    private trackService: TracksService,
+    @InjectRepository(FavoriteEntity)
+    private favoriteRepository: Repository<FavoriteEntity>,
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
   ) {}
 
   async getAlbums() {
@@ -57,25 +60,30 @@ export class AlbumsService {
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const album = await this.albumRepository.findOne({ where: { id: id } });
+    const album = await this.albumRepository.findOne({ where: { id } });
     if (!album) {
       throw new NotFoundException(ERROR_ALBUM_NOT_FOUND);
     }
 
-    const tracks = await this.trackService.getTracks();
+    const tracks = await this.trackRepository.find();
     const tracksOfAlbum = tracks.filter((track) => track.albumId === id);
     tracksOfAlbum.map(
       async (track) =>
-        await this.trackService.updateTrack(track.id, {
+        await this.trackRepository.save({
           ...track,
           albumId: null,
         }),
     );
-    return await this.albumRepository.delete(album.id);
-    // favorites.albums.forEach((fav, index) => {
-    //   if (fav === album.id) {
-    //     favorites.albums.splice(index, 1);
-    //   }
-    // });
+
+    const [favIds] = await this.favoriteRepository.find();
+    if (favIds && favIds.albums.length) {
+      const updatedAlbumFav = favIds.albums.filter((albumId) => albumId !== id);
+      const updatedFavs = {
+        ...favIds,
+        albums: updatedAlbumFav,
+      };
+      await this.favoriteRepository.save(updatedFavs);
+    }
+    return await this.albumRepository.delete(id);
   }
 }

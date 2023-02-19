@@ -18,7 +18,7 @@ export class TracksService {
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
     @InjectRepository(FavoriteEntity)
-    private favoritesRepository: Repository<FavoriteEntity>,
+    private favoriteRepository: Repository<FavoriteEntity>,
   ) {}
 
   async getTracks() {
@@ -53,15 +53,23 @@ export class TracksService {
     };
     return await this.trackRepository.save(updatedTrack);
   }
-  async deleteTask(id: string) {
+  async deleteTrack(id: string) {
     if (!validateId(id)) {
       throw new BadRequestException(ERROR_INVALID_ID);
     }
-    const track = await this.trackRepository.findOne({ where: { id: id } });
+    const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
       throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
     }
-    await this.favoritesRepository.delete(id);
-    return await this.trackRepository.delete(track.id);
+    const [favIds] = await this.favoriteRepository.find();
+    if (favIds && favIds.tracks) {
+      const updatedTrackFav = favIds.tracks.filter((trackId) => trackId !== id);
+      const updatedFavs = {
+        ...favIds,
+        tracks: updatedTrackFav,
+      };
+      await this.favoriteRepository.save(updatedFavs);
+    }
+    return await this.trackRepository.delete(id);
   }
 }

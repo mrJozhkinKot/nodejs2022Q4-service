@@ -16,6 +16,8 @@ services:
     volumes:
       - .:/app
       - /app/node_modules/
+    networks:
+      - server-node
 
 
   postgres:
@@ -31,7 +33,9 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./db/pgdata:${PG_DATA}
+    networks:
+      - server-node
 
-  networks:
-    default:
-      driver: bridge
+networks:
+  server-node:
+    driver: bridge

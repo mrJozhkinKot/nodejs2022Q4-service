@@ -13,15 +13,18 @@ import { UpdateArtistDTO } from './dto/update-artist-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ArtistEntity } from './artist.entity';
-import { TracksService } from 'src/tracks/track.service';
+import { TrackEntity } from 'src/tracks/track.entity';
+import { FavoriteEntity } from 'src/favorites/favorites.entity';
 
 @Injectable()
 export class ArtistsService {
   constructor(
     @InjectRepository(ArtistEntity)
-    private readonly artistRepository: Repository<ArtistEntity>,
-
-    private trackService: TracksService,
+    private artistRepository: Repository<ArtistEntity>,
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
+    @InjectRepository(FavoriteEntity)
+    private favoriteRepository: Repository<FavoriteEntity>,
   ) {}
 
   async getArtists() {
@@ -68,21 +71,26 @@ export class ArtistsService {
       throw new NotFoundException(ERROR_ARTIST_NOT_FOUND);
     }
 
-    const tracks = await this.trackService.getTracks();
-    const tracksOfAlbum = tracks.filter((track) => track.artistId === id);
-    tracksOfAlbum.map(
+    const tracks = await this.trackRepository.find();
+    const tracksOfArtist = tracks.filter((track) => track.artistId === id);
+    tracksOfArtist.map(
       async (track) =>
-        await this.trackService.updateTrack(track.id, {
+        await this.trackRepository.save({
           ...track,
           artistId: null,
         }),
     );
-
-    return await this.artistRepository.delete(artist.id);
-    // favorites.artists.forEach((fav, index) => {
-    //   if (fav === artist.id) {
-    //     favorites.artists.splice(index, 1);
-    //   }
-    // });
+    const [favIds] = await this.favoriteRepository.find();
+    if (favIds && favIds.artists.length) {
+      const updatedArtistFav = favIds.artists.filter(
+        (artistId) => artistId !== id,
+      );
+      const updatedFavs = {
+        ...favIds,
+        artists: updatedArtistFav,
+      };
+      await this.favoriteRepository.save(updatedFavs);
+    }
+    return await this.artistRepository.delete(id);
   }
 }
