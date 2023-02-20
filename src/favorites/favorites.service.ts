@@ -19,6 +19,12 @@ import { FavoritesRepsonse } from 'src/types/interfaces';
 import { Repository } from 'typeorm';
 import { FavoriteEntity } from './favorites.entity';
 
+type Favs = {
+  artists: string[];
+  albums: string[];
+  tracks: string[];
+};
+
 @Injectable()
 export class FavoritesService {
   constructor(
@@ -31,7 +37,8 @@ export class FavoritesService {
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
   ) {}
-  initFavs = {
+
+  initFavs: Favs = {
     artists: [],
     albums: [],
     tracks: [],
@@ -39,7 +46,7 @@ export class FavoritesService {
   async getFavorites(): Promise<FavoritesRepsonse> {
     const [favIds] = await this.favoriteRepository.find();
     if (!favIds) {
-      return this.initFavs;
+      await this.favoriteRepository.save(this.initFavs);
     }
     const artists = favIds.artists.length
       ? await Promise.all(

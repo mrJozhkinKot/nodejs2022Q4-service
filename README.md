@@ -18,6 +18,7 @@ Rename .env.example to .env
 ## Run Docker 
 
 ```
+npm run docker:build
 npm run docker
 ```
 
