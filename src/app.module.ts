@@ -9,6 +9,7 @@ import { TracksModule } from './tracks/tracks.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ormconfig } from './ormconfig';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ormconfig } from './ormconfig';
     ArtistsModule,
     AlbumsModule,
     FavoritesModule,
+    AuthModule,
     TypeOrmModule.forRoot(ormconfig),
   ],
   controllers: [AppController],

@@ -75,4 +75,14 @@ export class UsersService {
     }
     return await this.userRepository.delete(user.id);
   }
+
+  async getUserByLogin(dto: CreateUserDTO) {
+    const user = await this.userRepository.findOne({
+      where: { login: dto.login },
+    });
+    if (!user) {
+      throw new NotFoundException(ERROR_USER_NOT_FOUND);
+    }
+    return user;
+  }
 }
