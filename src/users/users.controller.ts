@@ -11,6 +11,7 @@ import {
   HttpCode,
   UseInterceptors,
   ClassSerializerInterceptor,
+  UseGuards,
 } from '@nestjs/common';
 import { User } from 'src/types/interfaces';
 import { CreateUserDTO } from './dto/create-user.dto';
@@ -18,6 +19,7 @@ import { UpdateUserPassword } from './dto/update-user-password.dto';
 import { UserEntity } from './user.entity';
 import { UsersService } from './users.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.quard';
 
 @ApiTags('USERS')
 @Controller('/user')
@@ -27,6 +29,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200 })
+  //@UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(200)
   async getUsers(): Promise<User[]> {

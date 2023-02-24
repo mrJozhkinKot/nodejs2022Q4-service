@@ -1,6 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude } from 'class-transformer';
-import { FavoriteEntity } from 'src/favorites/favorites.entity';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'artists' })
@@ -11,17 +9,19 @@ export class ArtistEntity {
   })
   @PrimaryGeneratedColumn('uuid')
   id: string; // uuid v4
+
   @ApiProperty({
     example: 'John Lennon',
     description: 'name',
   })
-  @Column()
+  @Column({ name: 'name', type: 'varchar' })
   name: string;
+
   @ApiProperty({
     example: 'true',
     description: 'grammy',
   })
-  @Column()
+  @Column({ name: 'grammy', type: 'boolean' })
   grammy: boolean;
 
   constructor(partial: Partial<ArtistEntity>) {

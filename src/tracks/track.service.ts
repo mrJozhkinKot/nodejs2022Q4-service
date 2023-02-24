@@ -10,15 +10,12 @@ import { UpdateTrackDTO } from './dto/update-track-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TrackEntity } from './track.entity';
 import { Repository } from 'typeorm';
-import { FavoriteEntity } from 'src/favorites/favorites.entity';
 
 @Injectable()
 export class TracksService {
   constructor(
     @InjectRepository(TrackEntity)
     private trackRepository: Repository<TrackEntity>,
-    @InjectRepository(FavoriteEntity)
-    private favoriteRepository: Repository<FavoriteEntity>,
   ) {}
 
   async getTracks() {
@@ -60,15 +57,6 @@ export class TracksService {
     const track = await this.trackRepository.findOne({ where: { id } });
     if (!track) {
       throw new NotFoundException(ERROR_TRACK_NOT_FOUND);
-    }
-    const [favIds] = await this.favoriteRepository.find();
-    if (favIds && favIds.tracks) {
-      const updatedTrackFav = favIds.tracks.filter((trackId) => trackId !== id);
-      const updatedFavs = {
-        ...favIds,
-        tracks: updatedTrackFav,
-      };
-      await this.favoriteRepository.save(updatedFavs);
     }
     return await this.trackRepository.delete(id);
   }

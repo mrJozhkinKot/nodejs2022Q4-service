@@ -15,6 +15,7 @@ export class FavoritesController {
   async getAllFavs(): Promise<FavoritesRepsonse> {
     return this.favoritesService.getFavorites();
   }
+
   @ApiOperation({ summary: 'Add track to favorites' })
   @ApiResponse({ status: 201 })
   @Post('track/:id')
@@ -22,6 +23,7 @@ export class FavoritesController {
   async addTrack(@Param('id') id: string) {
     return await this.favoritesService.addTrack(id);
   }
+
   @ApiOperation({ summary: 'Delete track from favorites' })
   @ApiResponse({ status: 204 })
   @Delete('track/:id')
@@ -29,6 +31,7 @@ export class FavoritesController {
   async deleteTrack(@Param('id') id: string) {
     return await this.favoritesService.deleteTrack(id);
   }
+
   @ApiOperation({ summary: 'Add album to favorites' })
   @ApiResponse({ status: 201 })
   @Post('album/:id')
@@ -36,6 +39,7 @@ export class FavoritesController {
   async addAlbum(@Param('id') id: string) {
     return await this.favoritesService.addAlbum(id);
   }
+
   @ApiOperation({ summary: 'Delete album from favorites' })
   @ApiResponse({ status: 204 })
   @Delete('album/:id')
@@ -43,6 +47,7 @@ export class FavoritesController {
   async deleteAlbum(@Param('id') id: string) {
     return await this.favoritesService.deleteAlbum(id);
   }
+
   @ApiOperation({ summary: 'Add artist to favorites' })
   @ApiResponse({ status: 201 })
   @Post('artist/:id')
@@ -50,6 +55,7 @@ export class FavoritesController {
   async addArtist(@Param('id') id: string) {
     return await this.favoritesService.addArtist(id);
   }
+
   @ApiOperation({ summary: 'Delete artist from favorites' })
   @ApiResponse({ status: 204 })
   @Delete('artist/:id')

@@ -8,3 +8,4 @@ export const ERROR_ARTIST_NOT_FOUND = 'The artist is not found';
 export const ERROR_REQUIRED = 'The field is required';
 export const ERROR_EMPTY = 'The value must be not empty';
 export const ERROR_STRING = 'The value must be string';
+export const ERROR_UNAUTHORIZE = 'The user is not authorized';
