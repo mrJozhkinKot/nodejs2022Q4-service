@@ -1,7 +1,16 @@
-import { Controller, Get, HttpCode, Post, Delete, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Delete,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { FavoritesRepsonse } from 'src/types/interfaces';
 import { FavoritesService } from './favorites.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.quard';
 
 @ApiTags('FAVORITES')
 @Controller('/favs')
@@ -10,6 +19,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Get all favorites' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(200)
   async getAllFavs(): Promise<FavoritesRepsonse> {
@@ -18,6 +28,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Add track to favorites' })
   @ApiResponse({ status: 201 })
+  @UseGuards(JwtAuthGuard)
   @Post('track/:id')
   @HttpCode(201)
   async addTrack(@Param('id') id: string) {
@@ -26,6 +37,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Delete track from favorites' })
   @ApiResponse({ status: 204 })
+  @UseGuards(JwtAuthGuard)
   @Delete('track/:id')
   @HttpCode(204)
   async deleteTrack(@Param('id') id: string) {
@@ -34,6 +46,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Add album to favorites' })
   @ApiResponse({ status: 201 })
+  @UseGuards(JwtAuthGuard)
   @Post('album/:id')
   @HttpCode(201)
   async addAlbum(@Param('id') id: string) {
@@ -50,6 +63,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Add artist to favorites' })
   @ApiResponse({ status: 201 })
+  @UseGuards(JwtAuthGuard)
   @Post('artist/:id')
   @HttpCode(201)
   async addArtist(@Param('id') id: string) {
@@ -58,6 +72,7 @@ export class FavoritesController {
 
   @ApiOperation({ summary: 'Delete artist from favorites' })
   @ApiResponse({ status: 204 })
+  @UseGuards(JwtAuthGuard)
   @Delete('artist/:id')
   @HttpCode(204)
   async deleteArtist(@Param('id') id: string) {

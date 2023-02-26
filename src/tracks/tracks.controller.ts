@@ -9,12 +9,14 @@ import {
   HttpCode,
   UsePipes,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { Track } from 'src/types/interfaces';
 import { CreateTrackDTO } from './dto/create-track.dto';
 import { UpdateTrackDTO } from './dto/update-track-dto';
 import { TracksService } from './track.service';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.quard';
 
 @ApiTags('TRACKS')
 @Controller('/track')
@@ -23,6 +25,7 @@ export class TracksController {
 
   @ApiOperation({ summary: 'Get all tracks' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(200)
   async getTracks(): Promise<Track[]> {
@@ -30,6 +33,7 @@ export class TracksController {
   }
   @ApiOperation({ summary: 'Get track by id' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @HttpCode(200)
   async getTrack(@Param('id') id: string) {
@@ -37,6 +41,7 @@ export class TracksController {
   }
   @ApiOperation({ summary: 'Create new track' })
   @ApiResponse({ status: 201 })
+  @UseGuards(JwtAuthGuard)
   @Post()
   @HttpCode(201)
   @UsePipes(ValidationPipe)
@@ -45,6 +50,7 @@ export class TracksController {
   }
   @ApiOperation({ summary: 'Update new track' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @HttpCode(200)
   @UsePipes(ValidationPipe)
@@ -53,6 +59,7 @@ export class TracksController {
   }
   @ApiOperation({ summary: 'Delete track by id' })
   @ApiResponse({ status: 204 })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteTrack(@Param('id') id: string) {

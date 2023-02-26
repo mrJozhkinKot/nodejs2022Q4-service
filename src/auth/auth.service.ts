@@ -1,10 +1,17 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDTO } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcrypt';
 import { UserEntity } from 'src/users/user.entity';
-import { ERROR_WRONG_PASSWORD } from 'src/helpers/constants';
+import {
+  ERROR_INVALID_BODY,
+  ERROR_WRONG_PASSWORD,
+} from 'src/helpers/constants';
 
 @Injectable()
 export class AuthService {
@@ -14,23 +21,38 @@ export class AuthService {
   ) {}
 
   async signup(userDto: CreateUserDTO) {
+    if (
+      !userDto.login ||
+      !userDto.password ||
+      typeof userDto.login !== 'string' ||
+      typeof userDto.password !== 'string'
+    ) {
+      throw new BadRequestException(ERROR_INVALID_BODY);
+    }
     const salt = Number(process.env.CRYPT_SALT) || 10;
     const hashPassword = await bcrypt.hash(userDto.password, salt);
-    const user = await this.userService.createUser({
+    return await this.userService.createUser({
       ...userDto,
       password: hashPassword,
     });
-    return this.generateToken(user);
   }
 
   async login(userDto: CreateUserDTO) {
+    if (
+      !userDto.login ||
+      !userDto.password ||
+      typeof userDto.login !== 'string' ||
+      typeof userDto.password !== 'string'
+    ) {
+      throw new BadRequestException(ERROR_INVALID_BODY);
+    }
     const user = await this.validateUser(userDto);
     return this.generateToken(user);
   }
 
   async generateToken(user: UserEntity) {
     return {
-      token: this.jwtService.sign({ login: user.login, id: user.id }),
+      accessToken: this.jwtService.sign({ login: user.login, id: user.id }),
     };
   }
 

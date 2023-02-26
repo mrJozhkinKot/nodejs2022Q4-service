@@ -29,7 +29,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get all users' })
   @ApiResponse({ status: 200 })
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   @HttpCode(200)
   async getUsers(): Promise<User[]> {
@@ -38,6 +38,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get user by id' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @HttpCode(200)
   async getUser(@Param('id') id: string) {
@@ -57,6 +58,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Update user password' })
   @ApiResponse({ status: 200 })
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   @HttpCode(200)
   @UsePipes(ValidationPipe)
@@ -70,6 +72,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Delete user by id' })
   @ApiResponse({ status: 204 })
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   @HttpCode(204)
   async deleteUser(@Param('id') id: string) {
