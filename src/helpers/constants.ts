@@ -1,0 +1,11 @@
+export const ERROR_INVALID_ID = 'Invalid ID. Please use uuid format';
+export const ERROR_INVALID_BODY = 'Invalid fields of body';
+export const ERROR_USER_NOT_FOUND = 'The user is not found';
+export const ERROR_WRONG_PASSWORD = 'The passford is wrong';
+export const ERROR_TRACK_NOT_FOUND = 'The track is not found';
+export const ERROR_ALBUM_NOT_FOUND = 'The album is not found';
+export const ERROR_ARTIST_NOT_FOUND = 'The artist is not found';
+export const ERROR_REQUIRED = 'The field is required';
+export const ERROR_EMPTY = 'The value must be not empty';
+export const ERROR_STRING = 'The value must be string';
+export const ERROR_UNAUTHORIZE = 'The user is not authorized';

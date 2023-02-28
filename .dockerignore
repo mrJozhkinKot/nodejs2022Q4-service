@@ -1,0 +1,8 @@
+**/.git
+**/.vscode
+**/docker-compose*
+**/Dockerfile*
+node_modules
+.env
+dist
+db/pgdata
